@@ -3,18 +3,10 @@ name: release
 on:
   release:
     types: [created]
-  workflow_dispatch:
-
-env:
-  BINARY_NAME: image-syncer
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.after }}
-  cancel-in-progress: true
 
 jobs:
-  releases-matrix:
-    name: Release Matrix
+  releases-binaries:
+    name: Release Go Binaries
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -22,11 +14,10 @@ jobs:
         goarch: [amd64, arm64]
     steps:
       - uses: actions/checkout@v2
-
       - uses: wangyoucao577/go-release-action@v1.16
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          binary_name: "${{ env.BINARY_NAME }}"
-          build_flags: -v
+          goversion: "https://golang.org/dl/go1.16.5.linux-amd64.tar.gz"
+          extra_files: LICENSE README.md
